@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали анализа</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        nav {
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #1f5fbf;
+            font-weight: 600;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(300px, 1fr));
+            gap: 14px 24px;
+        }
+
+        .label {
+            font-weight: 700;
+        }
+
+        .summary {
+            background: #eef6ff;
+            border-left: 5px solid #3b82f6;
+        }
+
+        .error-box {
+            background: #fff1f1;
+            border-left: 5px solid #dc2626;
+            color: #8b0000;
+        }
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        select, button, input {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+        }
+
+        button {
+            cursor: pointer;
+            background: #1f5fbf;
+            color: white;
+            border: none;
+        }
+
+        button.secondary {
+            background: #64748b;
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 420px;
+        }
+
+        .chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .section-title {
+            margin-bottom: 12px;
+        }
+
+        .download-link {
+            text-decoration: none;
+            color: #1f5fbf;
+            font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Детали анализа</h1>
+
+    <nav>
+        <a th:href="@{/dashboard}">Главная</a>
+        <a th:href="@{/datasets}">Датасеты</a>
+        <a th:href="@{/analysis}">Анализы</a>
+    </nav>
+
+    <div class="card">
+        <h2 class="section-title">Информация о задаче</h2>
+        <div class="grid">
+            <div><span class="label">ID:</span> <span th:text="${task.id}"></span></div>
+            <div><span class="label">Название:</span> <span th:text="${task.taskName}"></span></div>
+            <div><span class="label">Файл:</span> <span th:text="${task.dataset.originalFileName}"></span></div>
+            <div><span class="label">Временной столбец:</span> <span th:text="${task.timeColumn}"></span></div>
+            <div><span class="label">Признаки:</span> <span th:text="${task.featureColumns}"></span></div>
+            <div><span class="label">Window size:</span> <span th:text="${task.windowSize}"></span></div>
+            <div><span class="label">Stride:</span> <span th:text="${task.stride}"></span></div>
+            <div><span class="label">Latent dim:</span> <span th:text="${task.latentDim}"></span></div>
+            <div><span class="label">Epochs:</span> <span th:text="${task.epochs}"></span></div>
+            <div><span class="label">Batch size:</span> <span th:text="${task.batchSize}"></span></div>
+            <div><span class="label">Auto threshold:</span> <span th:text="${task.autoThreshold} ? 'Да' : 'Нет'"></span></div>
+            <div><span class="label">Threshold value:</span> <span th:text="${task.thresholdValue} ?: 'auto'"></span></div>
+            <div><span class="label">Статус:</span> <span th:text="${task.status}"></span></div>
+            <div><span class="label">Создано:</span> <span th:text="${task.createdAt}"></span></div>
+        </div>
+    </div>
+    <p><strong>Модель:</strong> <span th:text="${task.modelType}"></span></p>
+
+    <div th:if="${task.errorMessage}" class="card error-box">
+        <strong>Ошибка:</strong>
+        <span th:text="${task.errorMessage}"></span>
+    </div>
+
+    <div th:if="${task.resultSummary}" class="card summary">
+        <h2 class="section-title">Результат анализа</h2>
+        <p th:text="${task.resultSummary}"></p>
+    </div>
+
+    <div class="card" th:if="${task.status == 'PENDING'}">
+        <form th:action="@{/analysis/{id}/run(id=${task.id})}" method="post">
+            <button type="submit">Запустить анализ</button>
+        </form>
+    </div>
+
+    <div th:if="${task.chartDataJson}">
+        <div class="card">
+            <h2 class="section-title">Управление отображением</h2>
+            <div class="controls-row">
+                <label for="featureSelect"><strong>Признак:</strong></label>
+                <select id="featureSelect"></select>
+
+                <label for="maxPointsSelect"><strong>Точек на графике:</strong></label>
+                <select id="maxPointsSelect">
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value="2000" selected>2000</option>
+                    <option value="5000">5000</option>
+                </select>
+
+                <button type="button" id="resetFeatureZoom">Сбросить масштаб верхнего графика</button>
+                <button type="button" id="resetScoreZoom" class="secondary">Сбросить масштаб нижнего графика</button>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <a class="download-link" th:href="@{/analysis/{id}/export(id=${task.id})}">
+                    Скачать результаты в CSV
+                </a>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h2 class="section-title">График признака</h2>
+            <p class="muted">На графике отображаются значения выбранного признака и аномальные точки.</p>
+            <div class="chart-wrapper">
+                <canvas id="featureChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h2 class="section-title">График anomaly score</h2>
+            <p class="muted">Нижний график показывает score по точкам, порог и точки, помеченные как аномальные.</p>
+            <div class="chart-wrapper">
+                <canvas id="scoreChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" th:if="${topPoints != null and !#lists.isEmpty(topPoints)}">
+        <h2 class="section-title">Топ 20 самых подозрительных точек</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Индекс</th>
+                <th>Timestamp</th>
+                <th>Score</th>
+                <th>Аномалия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="point : ${topPoints}">
+                <td th:text="${point.index}"></td>
+                <td th:text="${point.timestamp}"></td>
+                <td th:text="${point.score}"></td>
+                <td th:text="${point.anomaly} ? 'Да' : 'Нет'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card" th:if="${anomalousPoints != null and !#lists.isEmpty(anomalousPoints)}">
+        <h2 class="section-title">Аномальные точки</h2>
+        <p class="muted">Ограничиваем показ первыми 100 строками, полный список можно увидеть скачав CSV-файл.</p>
+        <table>
+            <thead>
+            <tr>
+                <th>Индекс</th>
+                <th>Timestamp</th>
+                <th>Score</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="point : ${anomalousPoints}">
+                <td th:text="${point.index}"></td>
+                <td th:text="${point.timestamp}"></td>
+                <td th:text="${point.score}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const rawJson = /*[[${task.chartDataJson}]]*/ '{}';
+    const chartData = JSON.parse(rawJson);
+
+    const timestamps = chartData.timestamps || [];
+    const pointScores = chartData.pointScores || [];
+    const pointFlags = chartData.pointAnomalyFlags || [];
+    const featureSeries = chartData.featureSeries || {};
+    const pointThreshold = chartData.pointThreshold || null;
+
+    const featureNames = Object.keys(featureSeries);
+    const featureSelect = document.getElementById("featureSelect");
+    const maxPointsSelect = document.getElementById("maxPointsSelect");
+
+    let featureChartInstance = null;
+    let scoreChartInstance = null;
+
+    featureNames.forEach(feature => {
+        const option = document.createElement("option");
+        option.value = feature;
+        option.textContent = feature;
+        featureSelect.appendChild(option);
+    });
+
+    function getMaxPoints() {
+        return parseInt(maxPointsSelect.value, 10);
+    }
+
+    function calcStep(length, maxPoints) {
+        if (length <= maxPoints) {
+            return 1;
+        }
+        return Math.ceil(length / maxPoints);
+    }
+
+    function downsampleFeature(labels, values, flags, step) {
+        const sampledLabels = [];
+        const sampledValues = [];
+        const sampledFlags = [];
+
+        for (let i = 0; i < values.length; i += step) {
+            sampledLabels.push(labels[i]);
+            sampledValues.push(values[i]);
+            sampledFlags.push(flags[i]);
+        }
+
+        return { labels: sampledLabels, values: sampledValues, flags: sampledFlags };
+    }
+
+    function downsampleScore(labels, scores, flags, threshold, step) {
+        const sampledLabels = [];
+        const sampledScores = [];
+        const sampledFlags = [];
+        const sampledThreshold = [];
+
+        for (let i = 0; i < scores.length; i += step) {
+            sampledLabels.push(labels[i]);
+            sampledScores.push(scores[i]);
+            sampledFlags.push(flags[i]);
+            sampledThreshold.push(threshold);
+        }
+
+        return {
+            labels: sampledLabels,
+            scores: sampledScores,
+            flags: sampledFlags,
+            threshold: sampledThreshold
+        };
+    }
+
+    function getFeatureChartType(featureName, values) {
+        const uniqueCount = new Set(values).size;
+
+        if (featureName.toLowerCase().includes("store") || featureName.toLowerCase().includes("product")) {
+            return "scatter";
+        }
+
+        if (uniqueCount <= 20) {
+            return "scatter";
+        }
+
+        return "line";
+    }
+
+    function buildFeatureChart(featureName) {
+        const values = featureSeries[featureName] || [];
+        const step = calcStep(values.length, getMaxPoints());
+        const sampled = downsampleFeature(timestamps, values, pointFlags, step);
+        const chartType = getFeatureChartType(featureName, values);
+
+        const anomalyPoints = sampled.values.map((value, index) => sampled.flags[index] ? value : null);
+
+        const ctx = document.getElementById("featureChart").getContext("2d");
+
+        if (featureChartInstance) {
+            featureChartInstance.destroy();
+        }
+
+        featureChartInstance = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: sampled.labels,
+                datasets: [
+                    {
+                        label: `Значение признака: ${featureName}`,
+                        data: sampled.values,
+                        borderWidth: 1,
+                        pointRadius: chartType === "scatter" ? 1.5 : 0,
+                        showLine: chartType !== "scatter",
+                        tension: 0.1
+                    },
+                    {
+                        label: "Аномальные точки",
+                        data: anomalyPoints,
+                        showLine: false,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                animation: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true },
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: "x"
+                        },
+                        zoom: {
+                            wheel: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: "x"
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 15
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function buildScoreChart() {
+        const step = calcStep(pointScores.length, getMaxPoints());
+        const sampled = downsampleScore(timestamps, pointScores, pointFlags, pointThreshold, step);
+        const anomalyScores = sampled.scores.map((score, index) => sampled.flags[index] ? score : null);
+
+        const ctx = document.getElementById("scoreChart").getContext("2d");
+
+        if (scoreChartInstance) {
+            scoreChartInstance.destroy();
+        }
+
+        scoreChartInstance = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: sampled.labels,
+                datasets: [
+                    {
+                        label: "Anomaly score",
+                        data: sampled.scores,
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        tension: 0.1
+                    },
+                    {
+                        label: "Порог",
+                        data: sampled.threshold,
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        borderDash: [6, 6]
+                    },
+                    {
+                        label: "Аномальные точки",
+                        data: anomalyScores,
+                        showLine: false,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                animation: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true },
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: "x"
+                        },
+                        zoom: {
+                            wheel: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: "x"
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 15
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function rebuildCharts() {
+        if (featureNames.length > 0) {
+            buildFeatureChart(featureSelect.value || featureNames[0]);
+            buildScoreChart();
+        }
+    }
+
+    if (featureNames.length > 0) {
+        featureSelect.value = featureNames[0];
+        rebuildCharts();
+    }
+
+    featureSelect.addEventListener("change", rebuildCharts);
+    maxPointsSelect.addEventListener("change", rebuildCharts);
+
+    document.getElementById("resetFeatureZoom").addEventListener("click", function () {
+        if (featureChartInstance) {
+            featureChartInstance.resetZoom();
+        }
+    });
+
+    document.getElementById("resetScoreZoom").addEventListener("click", function () {
+        if (scoreChartInstance) {
+            scoreChartInstance.resetZoom();
+        }
+    });
+</script>
+</body>
+</html>

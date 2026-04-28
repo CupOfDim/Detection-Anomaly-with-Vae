@@ -1,0 +1,8 @@
+fastapi~=0.135.2
+uvicorn
+pydantic~=2.12.5
+pandas~=3.0.1
+openpyxl
+numpy~=2.4.3
+scikit-learn~=1.8.0
+tensorflow

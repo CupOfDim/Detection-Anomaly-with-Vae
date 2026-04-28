@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .hero {
+            background: #fff;
+            border-radius: 16px;
+            padding: 36px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 34px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: #1f5fbf;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .features {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        @media (max-width: 900px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1>Система детекции аномалий во временных рядах</h1>
+        <p>
+            Веб-приложение для загрузки датасетов, анализа временных рядов с использованием
+            вариационного автоэнкодера и визуализации результатов.
+        </p>
+
+        <div class="actions">
+            <a class="btn btn-primary" th:href="@{/login}">Войти</a>
+            <a class="btn btn-secondary" th:href="@{/register}">Регистрация</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="card">
+            <h3>Загрузка данных</h3>
+            <p>Поддержка CSV и XLSX, хранение датасетов и предпросмотр содержимого.</p>
+        </div>
+        <div class="card">
+            <h3>ML-анализ</h3>
+            <p>Подготовка временного ряда, построение окон и анализ через VAE.</p>
+        </div>
+        <div class="card">
+            <h3>Визуализация</h3>
+            <p>Графики, anomaly score, аномальные точки и экспорт результатов.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

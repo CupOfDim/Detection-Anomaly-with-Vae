@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        nav {
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #1f5fbf;
+            font-weight: 700;
+        }
+
+        .logout-form {
+            display: inline;
+        }
+
+        .logout-form button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: #64748b;
+            color: white;
+            cursor: pointer;
+        }
+
+        .hero, .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .hero {
+            margin-bottom: 20px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .card a {
+            color: #1f5fbf;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        @media (max-width: 900px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Личный кабинет</h1>
+
+    <nav>
+        <a th:href="@{/dashboard}">Главная</a>
+        <a th:href="@{/datasets}">Датасеты</a>
+        <a th:href="@{/analysis}">Анализы</a>
+        <form class="logout-form" th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </nav>
+
+    <div class="hero">
+        <h2>Добро пожаловать</h2>
+        <p>Здесь можно загружать временные ряды, запускать анализ и просматривать результаты детекции аномалий.</p>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Датасеты</h3>
+            <p>Загрузка, просмотр и удаление файлов CSV и XLSX.</p>
+            <a th:href="@{/datasets}">Перейти</a>
+        </div>
+
+        <div class="card">
+            <h3>Анализы</h3>
+            <p>Список задач анализа, запуск и просмотр результатов.</p>
+            <a th:href="@{/analysis}">Перейти</a>
+        </div>
+
+        <div class="card">
+            <h3>Результаты</h3>
+            <p>Графики, anomaly score, аномальные точки и экспорт в CSV.</p>
+            <a th:href="@{/analysis}">Открыть список анализов</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

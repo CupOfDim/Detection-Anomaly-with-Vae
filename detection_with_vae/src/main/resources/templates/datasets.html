@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Датасеты</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        nav {
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #1f5fbf;
+            font-weight: 700;
+        }
+
+        .logout-form {
+            display: inline;
+        }
+
+        .logout-form button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: #64748b;
+            color: white;
+            cursor: pointer;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .alert-success {
+            background: #eef6ff;
+            color: #1d4ed8;
+            border-left: 5px solid #3b82f6;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+        }
+
+        .alert-error {
+            background: #fff1f1;
+            color: #8b0000;
+            border-left: 5px solid #dc2626;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+        }
+
+        .upload-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1f5fbf;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .action-cell {
+            white-space: nowrap;
+        }
+
+        .inline-form {
+            display: inline-block;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Датасеты</h1>
+
+    <nav>
+        <a th:href="@{/dashboard}">Главная</a>
+        <a th:href="@{/datasets}">Датасеты</a>
+        <a th:href="@{/analysis}">Анализы</a>
+        <form class="logout-form" th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </nav>
+
+    <div class="card">
+        <h2>Загрузить новый датасет</h2>
+
+        <div class="alert-success" th:if="${success}">
+            Файл успешно загружен
+        </div>
+
+        <div class="alert-error" th:if="${error}" th:text="${error}"></div>
+
+        <form th:action="@{/datasets/upload}" method="post" enctype="multipart/form-data">
+            <div class="upload-row">
+                <input type="file" name="file" accept=".csv,.xlsx" required>
+                <button type="submit">Загрузить</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Мои датасеты</h2>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Исходное имя</th>
+                <th>Тип</th>
+                <th>Размер (байт)</th>
+                <th>Дата загрузки</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dataset : ${datasets}">
+                <td th:text="${dataset.id}"></td>
+                <td th:text="${dataset.originalFileName}"></td>
+                <td th:text="${dataset.fileType}"></td>
+                <td th:text="${dataset.fileSize}"></td>
+                <td th:text="${dataset.uploadTime}"></td>
+                <td th:text="${dataset.status}"></td>
+                <td class="action-cell">
+                    <form class="inline-form" th:action="@{/datasets/{id}(id=${dataset.id})}" method="get">
+                        <button type="submit" class="btn-secondary">Открыть</button>
+                    </form>
+                    <form class="inline-form"
+                          th:action="@{/datasets/delete/{id}(id=${dataset.id})}"
+                          method="post"
+                          onsubmit="return confirm('Удалить этот файл?');">
+                        <button type="submit" class="btn-danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(datasets)}">
+                <td colspan="7">У вас пока нет загруженных датасетов</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
