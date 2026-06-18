@@ -47,6 +47,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .owner(user)
                 .timeColumn(dto.getTimeColumn())
                 .featureColumns(String.join(",", dto.getFeatureColumns()))
+                .labelColumn(dto.getLabelColumn())
                 .windowSize(dto.getWindowSize())
                 .stride(dto.getStride())
                 .latentDim(dto.getLatentDim())
@@ -106,6 +107,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .fileType(task.getDataset().getFileType())
                     .timeColumn(task.getTimeColumn())
                     .featureColumns(List.of(task.getFeatureColumns().split(",")))
+                    .labelColumn(task.getLabelColumn())
                     .windowSize(task.getWindowSize())
                     .stride(task.getStride())
                     .latentDim(task.getLatentDim())
@@ -118,7 +120,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 
             PythonAnalysisResponseDto response = pythonAnalysisClient.runAnalysis(request);
             String summary = String.format(
-                    "Rows: %d, Features: %d, Windows: %d, Mean error: %.6f, Max error: %.6f, Threshold: %.6f, Anomalous windows: %d, Point threshold: %.6f, Anomalous points: %d",
+                    "Model: %s, Rows: %d, Features: %d, Windows: %d, Mean error: %.6f, Max error: %.6f, Threshold: %.6f, Anomalous windows: %d, Point threshold: %.6f, Anomalous points: %d, Final train loss: %.6f"+
+                    "Precision: %.4f, Recall: %.4f, F1: %.4f, ROC-AUC: %.4f, PR-AUC: %.4f",
+                    response.getModelType(),
                     response.getTotalRows(),
                     response.getTotalFeatures(),
                     response.getTotalWindows(),
@@ -127,11 +131,23 @@ public class AnalysisServiceImpl implements AnalysisService {
                     response.getThreshold(),
                     response.getAnomalyWindowIndices() != null ? response.getAnomalyWindowIndices().size() : 0,
                     response.getPointThreshold(),
-                    response.getAnomalyPointIndices() != null ? response.getAnomalyPointIndices().size() : 0
+                    response.getAnomalyPointIndices() != null ? response.getAnomalyPointIndices().size() : 0,
+                    response.getFinalTrainLoss() != null ? response.getFinalTrainLoss() : 0.0,
+                    response.getPrecision(),
+                    response.getRecall(),
+                    response.getF1Score(),
+                    response.getRocAuc(),
+                    response.getPrAuc()
             );
 
             task.setResultSummary(summary);
             task.setChartDataJson(objectMapper.writeValueAsString(response));
+
+            task.setPrecisionValue(response.getPrecision());
+            task.setRecallValue(response.getRecall());
+            task.setF1Score(response.getF1Score());
+            task.setRocAuc(response.getRocAuc());
+
             task.setStatus(response.getStatus() != null ? response.getStatus() : "COMPLETED");
             task.setFinishedAt(LocalDateTime.now());
 

@@ -75,4 +75,11 @@ public class AnalysisTask {
     @Column(nullable = false)
     private String modelType;
 
+    private String labelColumn;
+
+    private Double precisionValue;
+    private Double recallValue;
+    private Double f1Score;
+    private Double rocAuc;
+
 }

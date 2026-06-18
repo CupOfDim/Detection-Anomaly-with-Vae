@@ -23,4 +23,5 @@ public class PythonAnalysisRequestDto {
     private Boolean autoThreshold;
     private Double thresholdValue;
     private String modelType;
+    private String labelColumn;
 }

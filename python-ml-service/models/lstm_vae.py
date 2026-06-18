@@ -79,5 +79,5 @@ def build_lstm_vae(window_size: int, n_features: int, latent_dim: int):
 
     decoder = keras.Model(latent_inputs, decoder_outputs, name="lstm_decoder")
 
-    vae = SequenceVAE(encoder, decoder, beta=1.0)
+    vae = SequenceVAE(encoder, decoder, beta=0.1)
     return vae, encoder, decoder

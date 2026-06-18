@@ -29,4 +29,11 @@ public class PythonAnalysisResponseDto {
     private List<Double> pointScores;
     private List<Boolean> pointAnomalyFlags;
     private Map<String, List<Double>> featureSeries;
+    private String modelType;
+    private Double finalTrainLoss;
+    private Double precision;
+    private Double recall;
+    private Double f1Score;
+    private Double rocAuc;
+    private Double prAuc;
 }

@@ -179,9 +179,9 @@
             <div><span class="label">Threshold value:</span> <span th:text="${task.thresholdValue} ?: 'auto'"></span></div>
             <div><span class="label">Статус:</span> <span th:text="${task.status}"></span></div>
             <div><span class="label">Создано:</span> <span th:text="${task.createdAt}"></span></div>
+            <div><span class="label">Модель:</span> <span th:text="${task.modelType}"></span></div>
         </div>
     </div>
-    <p><strong>Модель:</strong> <span th:text="${task.modelType}"></span></p>
 
     <div th:if="${task.errorMessage}" class="card error-box">
         <strong>Ошибка:</strong>

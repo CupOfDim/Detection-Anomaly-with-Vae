@@ -54,7 +54,7 @@ public class FileStorageServiceImpl implements FileStorageService{
             Path path = Paths.get(filePath).toAbsolutePath().normalize();
             Files.deleteIfExists(path);
         } catch (IOException e) {
-            throw new RuntimeException("Щшибка удаления файла",e);
+            throw new RuntimeException("Ошибка удаления файла",e);
         }
     }
 

@@ -1,6 +1,11 @@
-import tensorflow as tf
+import torch
 
-layers = tf.keras.layers
+print("=== ПРОВЕРКА PYTORCH GPU ===")
+print("Версия PyTorch:", torch.__version__)
+print("Доступен ли CUDA (GPU):", torch.cuda.is_available())
 
-class VAE(tf.keras.Model):
-    pass
+if torch.cuda.is_available():
+    print("Имя видеокарты:", torch.cuda.get_device_name(0))
+    print("Текущее устройство CUDA:", torch.cuda.current_device())
+else:
+    print("\n[ВНИМАНИЕ] PyTorch не видит видеокарту. Используется CPU-only версия.")

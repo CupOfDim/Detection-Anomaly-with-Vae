@@ -77,5 +77,5 @@ def build_dense_vae(input_dim: int, latent_dim: int):
 
     decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
 
-    vae = VAE(encoder, decoder, beta=1.0)
+    vae = VAE(encoder, decoder, beta=0.1)
     return vae, encoder, decoder

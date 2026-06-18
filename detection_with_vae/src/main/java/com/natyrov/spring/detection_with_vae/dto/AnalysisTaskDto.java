@@ -52,4 +52,6 @@ public class AnalysisTaskDto {
 
     @NotBlank(message = "Выберите модель")
     private String modelType;
+
+    private String labelColumn;
 }

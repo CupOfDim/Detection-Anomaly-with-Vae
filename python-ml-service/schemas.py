@@ -16,6 +16,7 @@ class AnalysisRequest(BaseModel):
     autoThreshold: bool
     thresholdValue: Optional[float] = None
     modelType: str
+    labelColumn: Optional[str] = None
 
 
 class AnalysisResponse(BaseModel):
@@ -43,3 +44,8 @@ class AnalysisResponse(BaseModel):
 
     modelType: str
     finalTrainLoss: float | None = None
+    precision: Optional[float] = None
+    recall: Optional[float] = None
+    f1Score: Optional[float] = None
+    rocAuc: Optional[float] = None
+    prAuc: Optional[float] = None

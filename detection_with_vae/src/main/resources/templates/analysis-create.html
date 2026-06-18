@@ -135,6 +135,7 @@
                 <select th:field="*{modelType}">
                     <option value="DENSE_VAE">Dense VAE</option>
                     <option value="LSTM_VAE">LSTM VAE</option>
+                    <option value="ATTENTION_VAE">Attention-enhanced VAE</option>
                 </select>
                 <div class="error" th:if="${#fields.hasErrors('modelType')}" th:errors="*{modelType}"></div>
             </div>
@@ -150,6 +151,10 @@
 
             <div class="field">
                 <label>Признаки для анализа</label>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px;">
+                    <button type="button" id="selectAllBtn" style="padding: 6px 12px; background: #64748b; font-size: 13px;">Выбрать все</button>
+                    <button type="button" id="deselectAllBtn" style="padding: 6px 12px; background: #cbd5e1; color: #334155; font-size: 13px;">Снять все</button>
+                </div>
                 <div class="checkbox-list">
                     <label th:each="col : ${preview.numericColumns}">
                         <input type="checkbox" th:field="*{featureColumns}" th:value="${col}">
@@ -189,6 +194,17 @@
                     <label>Threshold value</label>
                     <input type="number" step="0.0001" th:field="*{thresholdValue}">
                 </div>
+
+                <div class="field">
+                    <label>Столбец с истинными аномалиями</label>
+                    <select th:field="*{labelColumn}">
+                        <option value="">Нет</option>
+                        <option th:each="col : ${preview.headers}"
+                                th:value="${col}"
+                                th:text="${col}">
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <div class="field">
@@ -212,5 +228,24 @@
         </ul>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Находим все чекбоксы признаков
+        const checkboxes = document.querySelectorAll('.checkbox-list input[type="checkbox"]');
+
+        // 1. АВТОМАТИЧЕСКИ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ ВЫБИРАЕМ ВСЕ
+        checkboxes.forEach(cb => cb.checked = true);
+
+        // 2. Логика для кнопки "Выбрать все"
+        document.getElementById('selectAllBtn').addEventListener('click', function() {
+            checkboxes.forEach(cb => cb.checked = true);
+        });
+
+        // 3. Логика для官方 кнопки "Снять все"
+        document.getElementById('deselectAllBtn').addEventListener('click', function() {
+            checkboxes.forEach(cb => cb.checked = false);
+        });
+    });
+</script>
 </body>
 </html>

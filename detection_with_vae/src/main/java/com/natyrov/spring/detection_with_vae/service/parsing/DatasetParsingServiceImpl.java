@@ -12,6 +12,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
+import java.io.BufferedReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,11 +57,24 @@ public class DatasetParsingServiceImpl implements DatasetParsingService{
         Map<String, List<String>> columnValues = new LinkedHashMap<>();
         int totalRows = 0;
 
+        // --- ШАГ 1: АВТООПРЕДЕЛЕНИЕ РАЗДЕЛИТЕЛЯ ---
+        char delimiter = ','; // По умолчанию запятая
+        try (BufferedReader br = new BufferedReader(new FileReader(dataset.getFilePath()))) {
+            String firstLine = br.readLine();
+            if (firstLine != null && firstLine.contains(";")) {
+                delimiter = ';'; // Если нашли точку с запятой, переключаемся на неё
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при определении разделителя CSV", e);
+        }
+        // -----------------------------------------
+
         try(FileReader reader = new FileReader(dataset.getFilePath());
             CSVParser parser = CSVFormat.DEFAULT
                     .builder()
                     .setHeader()
                     .setSkipHeaderRecord(true)
+                    .setDelimiter(delimiter) // <-- ШАГ 2: ПЕРЕДАЕМ НАЙДЕННЫЙ РАЗДЕЛИТЕЛЬ СЮДА
                     .build()
                     .parse(reader))
         {
@@ -70,7 +84,7 @@ public class DatasetParsingServiceImpl implements DatasetParsingService{
             }
 
             for(CSVRecord record: parser){
-                totalRows +=1;
+                totalRows += 1;
 
                 Map<String, String> rowMap = new LinkedHashMap<>();
                 for(String header:headers){
@@ -78,7 +92,7 @@ public class DatasetParsingServiceImpl implements DatasetParsingService{
                     rowMap.put(header, value);
                     columnValues.get(header).add(value);
                 }
-                if(previewRows.size()<10){
+                if(previewRows.size() < 10){
                     previewRows.add(rowMap);
                 }
             }
